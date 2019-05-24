@@ -34,6 +34,7 @@
 #include <grub/i386/relocator.h>
 #include <grub/i18n.h>
 #include <grub/lib/cmdline.h>
+#include <grub/slaunch.h>
 #include <grub/linux.h>
 #include <grub/machine/kernel.h>
 
@@ -80,6 +81,8 @@ static grub_efi_uintn_t efi_mmap_size;
 #else
 static const grub_size_t efi_mmap_size = 0;
 #endif
+static grub_err_t (*grub_slaunch_func) (struct grub_slaunch_params*) = NULL;
+static struct grub_slaunch_params slparams;
 
 /* FIXME */
 #if 0
@@ -95,6 +98,12 @@ static struct idt_descriptor idt_desc =
     0
   };
 #endif
+
+void
+grub_linux_slaunch_set (grub_err_t (*sfunc) (struct grub_slaunch_params*))
+{
+  grub_slaunch_func = sfunc;
+}
 
 static inline grub_size_t
 page_align (grub_size_t size)
@@ -285,7 +294,7 @@ grub_linux_setup_video (struct linux_kernel_params *params)
 	  params->lfb_size >>= 16;
 	  params->have_vga = GRUB_VIDEO_LINUX_TYPE_VESA;
 	  break;
-	
+
 	case GRUB_VIDEO_DRIVER_EFI_UGA:
 	case GRUB_VIDEO_DRIVER_EFI_GOP:
 	  params->have_vga = GRUB_VIDEO_LINUX_TYPE_EFIFB;
@@ -583,9 +592,9 @@ grub_linux_boot (void)
 					 &efi_desc_size, &efi_desc_version);
     if (err)
       return err;
-    
+
     /* Note that no boot services are available from here.  */
-    efi_mmap_target = ctx.real_mode_target 
+    efi_mmap_target = ctx.real_mode_target
       + ((grub_uint8_t *) efi_mmap_buf - (grub_uint8_t *) real_mode_mem);
     /* Pass EFI parameters.  */
     if (grub_le_to_cpu16 (ctx.params->version) >= 0x0208)
@@ -615,6 +624,15 @@ grub_linux_boot (void)
       }
   }
 #endif
+
+  /* If a secondary loader was set for secure launch, call it here.  */
+  if (grub_slaunch_func)
+    {
+      slparams.params = ctx.params;
+      slparams.real_mode_target = ctx.real_mode_target;
+      slparams.prot_mode_target = prot_mode_target;
+      return grub_slaunch_func (&slparams);
+    }
 
   /* FIXME.  */
   /*  asm volatile ("lidt %0" : : "m" (idt_desc)); */
@@ -735,7 +753,7 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
       align = 0;
       relocatable = 0;
     }
-    
+
   if (grub_le_to_cpu16 (lh.version) >= 0x020a)
     {
       min_align = lh.min_alignment;
