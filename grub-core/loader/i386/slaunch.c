@@ -179,9 +179,9 @@ grub_cmd_slaunch_module (grub_command_t cmd __attribute__ ((unused)),
 
   grub_printf("%s:%d: allocate memory\r\n", __FUNCTION__, __LINE__);
   err = grub_relocator_alloc_chunk_align (relocator, &ch,
-					  0x4000000, /* hardcode for debug purposes */
+					  0x2000000, /* hardcode for debug purposes, must be < 0x3000000 because of DEV */
 					  (0xffffffff - size) + 1,
-					  size, 0x1000,
+					  size, 0x10000,
 					  GRUB_RELOCATOR_PREFERENCE_NONE, 1);
   if (err)
     {
