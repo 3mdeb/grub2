@@ -575,6 +575,18 @@ grub_linux_boot (void)
   grub_memcpy ((char *) ctx.params + cl_offset, linux_cmdline,
 	       maximal_cmdline_size);
 
+  grub_memcpy (ctx.params->cmd_line_ptr, linux_cmdline,
+	       maximal_cmdline_size);
+
+  grub_dprintf ("linux", "cmd_line_ptr = %p\n",
+                ctx.params->cmd_line_ptr);
+  grub_dprintf ("linux", "old cmdline = %s\n",
+                linux_cmdline);
+  grub_dprintf ("linux", "new cmdline = %s\n",
+                (char *) ctx.params + cl_offset);
+  grub_dprintf ("linux", "new cmdline addr = %p\n",
+                (char *) ctx.params + cl_offset);
+
   grub_dprintf ("linux", "code32_start = %x\n",
 		(unsigned) ctx.params->code32_start);
 
