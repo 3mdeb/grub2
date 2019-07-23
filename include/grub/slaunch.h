@@ -25,6 +25,7 @@
 #include <grub/i386/linux.h>
 
 #define GRUB_SL_BOOTPARAMS_OFFSET	0x12c
+#define GRUB_SL_ZEROPAGE_OFFSET		0x18
 
 struct grub_slaunch_info
 {
