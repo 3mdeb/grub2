@@ -23,6 +23,7 @@
 
 #include <grub/types.h>
 #include <grub/i386/linux.h>
+#include <grub/i386/relocator.h>
 
 #define GRUB_SL_BOOTPARAMS_OFFSET	0x12c
 #define GRUB_SL_ZEROPAGE_OFFSET		0x18
@@ -53,9 +54,9 @@ struct grub_slaunch_module
 
 struct grub_slaunch_module *grub_slaunch_get_modules (void);
 
-grub_err_t grub_slaunch_boot_txt (struct grub_slaunch_params *slparams);
-grub_err_t grub_slaunch_boot_skinit (struct grub_slaunch_params *slparams);
+grub_err_t grub_slaunch_boot_txt (struct grub_slaunch_params *slparams, struct grub_relocator *relocator);
+grub_err_t grub_slaunch_boot_skinit (struct grub_slaunch_params *slparams, struct grub_relocator *relocator);
 
-void grub_linux_slaunch_set (grub_err_t (*sfunc) (struct grub_slaunch_params*));
+void grub_linux_slaunch_set (grub_err_t (*sfunc) (struct grub_slaunch_params*, struct grub_relocator*));
 
 #endif

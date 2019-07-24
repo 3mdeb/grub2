@@ -81,7 +81,7 @@ static grub_efi_uintn_t efi_mmap_size;
 #else
 static const grub_size_t efi_mmap_size = 0;
 #endif
-static grub_err_t (*grub_slaunch_func) (struct grub_slaunch_params*) = NULL;
+static grub_err_t (*grub_slaunch_func) (struct grub_slaunch_params*, struct grub_relocator*) = NULL;
 static struct grub_slaunch_params slparams;
 
 /* FIXME */
@@ -100,7 +100,7 @@ static struct idt_descriptor idt_desc =
 #endif
 
 void
-grub_linux_slaunch_set (grub_err_t (*sfunc) (struct grub_slaunch_params*))
+grub_linux_slaunch_set (grub_err_t (*sfunc) (struct grub_slaunch_params*, struct grub_relocator*))
 {
   grub_slaunch_func = sfunc;
 }
@@ -575,8 +575,8 @@ grub_linux_boot (void)
   grub_memcpy ((char *) ctx.params + cl_offset, linux_cmdline,
 	       maximal_cmdline_size);
 
-  grub_memcpy (ctx.params->cmd_line_ptr, linux_cmdline,
-	       maximal_cmdline_size);
+  //~ grub_memcpy (ctx.params->cmd_line_ptr, linux_cmdline,
+	       //~ maximal_cmdline_size);
 
   grub_dprintf ("linux", "code32_start = %x\n",
 		(unsigned) ctx.params->code32_start);
@@ -634,7 +634,7 @@ grub_linux_boot (void)
       slparams.params = ctx.params;
       slparams.real_mode_target = ctx.real_mode_target;
       slparams.prot_mode_target = prot_mode_target;
-      return grub_slaunch_func (&slparams);
+      return grub_slaunch_func (&slparams, relocator);
     }
 
   /* FIXME.  */

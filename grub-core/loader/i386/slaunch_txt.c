@@ -25,11 +25,13 @@
 #include <grub/dl.h>
 #include <grub/cpu/txt.h>
 #include <grub/slaunch.h>
+#include <grub/i386/relocator.h>
 
 grub_err_t
-grub_slaunch_boot_txt (struct grub_slaunch_params *slparams)
+grub_slaunch_boot_txt (struct grub_slaunch_params *slparams, struct grub_relocator *relocator)
 {
   slparams = slparams;
+  relocator = relocator;
 
   return GRUB_ERR_NONE;
 }
