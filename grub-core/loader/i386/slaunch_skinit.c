@@ -25,6 +25,7 @@
 #include <grub/dl.h>
 #include <grub/slaunch.h>
 #include <grub/i386/relocator.h>
+#include <grub/tis.h>
 
 static void skinit(void) {
   __asm__("push %eax\n\
@@ -57,6 +58,9 @@ grub_slaunch_boot_skinit (struct grub_slaunch_params *slparams, struct grub_relo
   grub_dprintf("linux", "Invoke SKINIT\r\n");
 
   if (grub_slaunch_get_modules()) {
+    grub_tis_init();
+    grub_tis_request_locality(0xff);
+
     state.eax = slb;
     state.esp = slparams->real_mode_target;
     state.eip = skinit;
