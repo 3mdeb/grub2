@@ -44,22 +44,21 @@ grub_err_t
 grub_slaunch_boot_skinit (struct grub_slaunch_params *slparams, struct grub_relocator *relocator)
 {
   grub_uint32_t *slb = (grub_uint32_t *)0x2000000;
+  grub_uint32_t *apic = (grub_uint32_t *)0xfee00300ULL;
   struct grub_relocator32_state state;
 
   grub_printf("%s:%d: real_mode_target: 0x%x\r\n", __FUNCTION__, __LINE__, slparams->real_mode_target);
   grub_printf("%s:%d: prot_mode_target: 0x%x\r\n", __FUNCTION__, __LINE__, slparams->prot_mode_target);
   grub_printf("%s:%d: params: %p\r\n", __FUNCTION__, __LINE__, slparams->params);
 
-  /* FIXME: some variant of this is done by grub_relocator32_boot(),
-   * check if some additional magic code relocation stuff is done there */
-  //grub_memmove((void*)0x1000000, (void*)0x100000, 6*1024*1024);
-
   slb[GRUB_SL_ZEROPAGE_OFFSET/4] = (grub_uint32_t)slparams->params;
   grub_dprintf("linux", "Invoke SKINIT\r\n");
 
   if (grub_slaunch_get_modules()) {
+    *apic = 0x000c0500;               // INIT, all excluding self
+
     grub_tis_init();
-    grub_tis_request_locality(0xff);
+    grub_tis_request_locality(0xff);  // relinquish all localities
 
     state.eax = slb;
     state.esp = slparams->real_mode_target;
