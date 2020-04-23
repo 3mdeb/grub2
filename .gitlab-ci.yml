@@ -3,11 +3,13 @@ image: debian:stable-20200414
 stages:
   - build
 
-before_script:
-  - apt update && apt install -y build-essential bison flex python pkg-config autoconf automake git gettext autopoint libfuse-dev libdevmapper-dev libfreetype6-dev
-
 build_and_install:
-  stage: build
+  stage:
+    - build
+  tags:
+    - local
+  before_script:
+    - apt update && apt install -y build-essential bison flex python pkg-config autoconf automake git gettext autopoint libfuse-dev libdevmapper-dev libfreetype6-dev
   script:
     - ./bootstrap
     - ./configure
