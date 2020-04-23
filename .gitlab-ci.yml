@@ -4,8 +4,7 @@ stages:
   - build
 
 build_and_install:
-  stage:
-    - build
+  stage: build
   tags:
     - local
   before_script:
