@@ -1,10 +1,9 @@
-image: debian:stable-20200414
-
 stages:
   - build
 
 build_and_install:
   stage: build
+  image: debian:stable-20200414
   tags:
     - local
   before_script:
